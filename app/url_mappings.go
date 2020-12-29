@@ -12,7 +12,10 @@ func mapUrls() {
 	router.GET("/users/", usersController.GetUsers)
 	// GET USER
 	router.GET("/users/:user_id", usersController.GetUser)
-
 	// CREATE USER
 	router.POST("/users", usersController.CreateUser)
+	// UPDATE USER
+	router.PUT("/users/:user_id", usersController.UpdateUser)
+	// UPDATING USER (PARTIAL)
+	router.PATCH("/users/:user_id", usersController.UpdateUser)
 }
