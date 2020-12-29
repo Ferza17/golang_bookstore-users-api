@@ -8,5 +8,5 @@ var (
 
 func StartApplication() {
 	mapUrls()
-	router.Run()
+	_ = router.Run()
 }

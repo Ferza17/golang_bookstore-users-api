@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/ferza17/golang_bookstore-users-api/domain/users"
-	"github.com/ferza17/golang_bookstore-users-api/util/errors"
+	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
 )
 
 func CreateUser(user users.User) (*users.User, *errors.RestError) {

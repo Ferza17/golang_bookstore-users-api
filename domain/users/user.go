@@ -1,6 +1,6 @@
 package users
 
-import "github.com/ferza17/golang_bookstore-users-api/util/errors"
+import "github.com/ferza17/golang_bookstore-users-api/utils/errors"
 
 type User struct {
 	ID          int64  `json:"id"`
