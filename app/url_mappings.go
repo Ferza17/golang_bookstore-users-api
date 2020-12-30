@@ -18,4 +18,8 @@ func mapUrls() {
 	router.PUT("/users/:user_id", usersController.UpdateUser)
 	// UPDATING USER (PARTIAL)
 	router.PATCH("/users/:user_id", usersController.UpdateUser)
+	// DELETE User
+	router.DELETE("/users/:user_id", usersController.DeleteUser)
+	// Search By status with query params ?status=""
+	router.GET("internal/users/search", usersController.Search)
 }

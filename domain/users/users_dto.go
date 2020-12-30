@@ -10,11 +10,15 @@ type User struct {
 	Lastname    string `json:"lastname"`
 	Email       string `json:"email"`
 	DateCreated string `json:"dateCreated"`
+	Status      string `json:"status"`
+	Password    string `json:"password"`
 }
 
+const (
+	StatusActive = "active"
+)
 
-
-func (user *User) Validate()  *errors.RestError{
+func (user *User) Validate() *errors.RestError {
 	// Remove Space of Firstname
 	//user.Firstname = strings.TrimSpace(user.Firstname)
 	// Remove Space of Firstname
@@ -22,7 +26,7 @@ func (user *User) Validate()  *errors.RestError{
 
 	// Validate email if the value is empty
 	if user.Email == "" {
-		return  errors.NewBadRequestError("Invalid Email Address!")
+		return errors.NewBadRequestError("Invalid Email Address!")
 	}
 	return nil
 }

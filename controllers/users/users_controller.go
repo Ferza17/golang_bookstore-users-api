@@ -22,9 +22,9 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	// GET USER WITH SERBICES
+	// GET USER WITH SERVICES
 	user, getErr := services.GetUser(userId)
-	if getErr != nil{
+	if getErr != nil {
 		c.JSON(getErr.Status, getErr)
 		return
 	}
@@ -33,6 +33,7 @@ func GetUser(c *gin.Context) {
 
 }
 
+//CreateUser
 func CreateUser(c *gin.Context) {
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -49,7 +50,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, result)
 }
 
-func UpdateUser(c *gin.Context)  {
+func UpdateUser(c *gin.Context) {
 	var user users.User
 	// GET PARAMS
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
@@ -72,8 +73,35 @@ func UpdateUser(c *gin.Context)  {
 	// IF PARTIAL UPDATE USING PATCH METHOD
 	isPartial := c.Request.Method == http.MethodPatch
 
+	result, err := services.UpdateUser(isPartial, user)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
 
-	result,err := services.UpdateUser(isPartial,user)
+func DeleteUser(c *gin.Context) {
+	// GET PARAMS
+	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	// CHECK IF ERROR
+	if userErr != nil {
+		err := errors.NewBadRequestError("user id should be a number")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	if err := services.DeleteUser(userId); err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]string{"status": "Deleted"})
+}
+
+func Search(c *gin.Context) {
+	status := c.Query("status")
+	result, err := services.Search(status)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
