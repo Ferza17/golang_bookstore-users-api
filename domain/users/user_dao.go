@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 	"github.com/ferza17/golang_bookstore-users-api/datasources/mysql/users_db"
+	"github.com/ferza17/golang_bookstore-users-api/utils/crypt"
 	"github.com/ferza17/golang_bookstore-users-api/utils/date"
 	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
 	mysqlUtils "github.com/ferza17/golang_bookstore-users-api/utils/mysql"
@@ -44,6 +45,7 @@ func (user *User) Save() *errors.RestError {
 
 	user.DateCreated = date.GetNowString()
 	user.Status = StatusActive
+	user.Password = crypt.GetMd5(user.Password)
 	insertResult, err := stmt.Exec(&user.Firstname, &user.Lastname, &user.Email, &user.DateCreated, &user.Status, &user.Password)
 	if err != nil {
 		return mysqlUtils.ParseError(err)

@@ -9,7 +9,7 @@ func mapUrls() {
 	router.GET("/ping", pingController.Ping)
 
 	// GET  USERS
-	router.GET("/users/", usersController.GetUsers)
+	//router.GET("/users/", usersController.GetUsers)
 	// GET USER
 	router.GET("/users/:user_id", usersController.GetUser)
 	// CREATE USER

@@ -1,16 +1,19 @@
 package controllers
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/ferza17/golang_bookstore-users-api/domain/users"
 	"github.com/ferza17/golang_bookstore-users-api/services"
 	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
-func GetUsers(c *gin.Context) {}
+//func GetUsers(c *gin.Context) {}
+
+//func TestServiceInterface()  {
+////services.UserServices.
+//}
 
 func GetUser(c *gin.Context) {
 	// GET PARAMS
@@ -23,13 +26,13 @@ func GetUser(c *gin.Context) {
 	}
 
 	// GET USER WITH SERVICES
-	user, getErr := services.GetUser(userId)
+	user, getErr := services.UserServices.GetUser(userId)
 	if getErr != nil {
 		c.JSON(getErr.Status, getErr)
 		return
 	}
 	// SEND RESPONSE
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public")=="true"))
 
 }
 
@@ -42,12 +45,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	result, saveErr := services.CreateUser(user)
+	result, saveErr := services.UserServices.CreateUser(user)
 	if saveErr != nil {
 		c.JSON(saveErr.Status, saveErr)
 		return
 	}
-	c.JSON(http.StatusCreated, result)
+	c.JSON(http.StatusCreated, result.Marshall(c.GetHeader("X-Public")=="true"))
 }
 
 func UpdateUser(c *gin.Context) {
@@ -73,7 +76,7 @@ func UpdateUser(c *gin.Context) {
 	// IF PARTIAL UPDATE USING PATCH METHOD
 	isPartial := c.Request.Method == http.MethodPatch
 
-	result, err := services.UpdateUser(isPartial, user)
+	result, err := services.UserServices.UpdateUser(isPartial, user)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
@@ -91,7 +94,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := services.DeleteUser(userId); err != nil {
+	if err := services.UserServices.DeleteUser(userId); err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
@@ -101,10 +104,11 @@ func DeleteUser(c *gin.Context) {
 
 func Search(c *gin.Context) {
 	status := c.Query("status")
-	result, err := services.Search(status)
+	result, err := services.UserServices.Search(status)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, result.Marshall(c.GetHeader("X-Public")=="true"))
+
 }
