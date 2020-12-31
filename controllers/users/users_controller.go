@@ -11,10 +11,6 @@ import (
 
 //func GetUsers(c *gin.Context) {}
 
-//func TestServiceInterface()  {
-////services.UserServices.
-//}
-
 func GetUser(c *gin.Context) {
 	// GET PARAMS
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
@@ -37,7 +33,7 @@ func GetUser(c *gin.Context) {
 }
 
 //CreateUser
-func CreateUser(c *gin.Context) {
+func  CreateUser(c *gin.Context) {
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := errors.NewBadRequestError("Invalid json Body")
@@ -53,7 +49,7 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, result.Marshall(c.GetHeader("X-Public")=="true"))
 }
 
-func UpdateUser(c *gin.Context) {
+func  UpdateUser(c *gin.Context) {
 	var user users.User
 	// GET PARAMS
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
@@ -84,7 +80,7 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func DeleteUser(c *gin.Context) {
+func  DeleteUser(c *gin.Context) {
 	// GET PARAMS
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	// CHECK IF ERROR
@@ -102,7 +98,7 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]string{"status": "Deleted"})
 }
 
-func Search(c *gin.Context) {
+func  Search(c *gin.Context) {
 	status := c.Query("status")
 	result, err := services.UserServices.Search(status)
 	if err != nil {
