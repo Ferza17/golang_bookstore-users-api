@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	queryInsertUser       = "INSERT INTO users(Firstname, Lastname,Email,DateCreated, Status, Password) VALUES (?,?,?,?,?,?);"
-	queryGetUser          = "SELECT * FROM users WHERE ID=?"
-	queryUpdateUser       = "UPDATE users SET Firstname=?, Lastname=?, Email=? , Status =?, Password=? WHERE ID=?"
-	queryDeleteUser       = "DELETE FROM users WHERE ID=?"
-	queryFindUserByStatus = "SELECT ID,Firstname, Lastname,Email,DateCreated, Status FROM users WHERE Status =?"
-)
+	queryInsertUser       		= "INSERT INTO users(Firstname, Lastname,Email,DateCreated, Status, Password) VALUES (?,?,?,?,?,?);"
+	queryGetUser          		= "SELECT * FROM users WHERE ID=?"
+	queryUpdateUser       		= "UPDATE users SET Firstname=?, Lastname=?, Email=? , Status =?, Password=? WHERE ID=?"
+	queryDeleteUser       		= "DELETE FROM users WHERE ID=?"
+	queryFindUserByStatus 		= "SELECT ID,Firstname, Lastname,Email,DateCreated, Status FROM users WHERE Status =?"
+	queryFindByEmailAndPassword = "SELECT ID, Firstname, Lastname, Email, DateCreated, Status FROM users WHERE Email=? AND Password=?"
+	)
 
 // Communicate with database to GET DATA
 func (user *User) Get() *errors.RestError {
@@ -128,4 +129,23 @@ func (user *User) Search(status string) ([]User, *errors.RestError) {
 		return nil, errors.NewNotFoundError(fmt.Sprintf("no users matching status %s", status))
 	}
 	return results, nil
+}
+
+func (user *User) FindByEmailAndPassword() *errors.RestError {
+	// ACCESS datasource users_db to communicate with database, GET query in constant variable
+	stmt, err := users_db.Client.Prepare(queryFindByEmailAndPassword)
+	if err != nil {
+		logger.Error("error when trying to prepare get user by email and password statement", err)
+		return errors.NewInternalServerError("Database Error")
+	}
+	// Defer in compile after return, it's like stack. if u open connection u most to stop it to avoid memory leaks and secure the app, it run before return statement
+	defer stmt.Close()
+
+	// executing query with email and password that declare in constant and save result to result variable
+	result := stmt.QueryRow(user.Email, user.Password)
+	if getErr := result.Scan(&user.ID, &user.Firstname, &user.Lastname, &user. Email, &user.DateCreated, &user.Status); getErr != nil {
+		logger.Error("error when trying to get user by email and password", err)
+		return errors.NewInternalServerError("Database Error")
+	}
+	return nil
 }

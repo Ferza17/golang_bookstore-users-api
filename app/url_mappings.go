@@ -22,4 +22,6 @@ func mapUrls() {
 	router.DELETE("/users/:user_id", usersController.DeleteUser)
 	// Search By status with query params ?status=""
 	router.GET("internal/users/search", usersController.Search)
+	// Login User
+	router.POST("/users/login", usersController.Login)
 }
