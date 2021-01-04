@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/ferza17/bookstore_oauth_library-go/oauth"
 	"github.com/ferza17/golang_bookstore-users-api/domain/users"
 	"github.com/ferza17/golang_bookstore-users-api/services"
 	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
@@ -12,6 +13,11 @@ import (
 //func GetUsers(c *gin.Context) {}
 
 func GetUser(c *gin.Context) {
+	if err := oauth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
 	// GET PARAMS
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	// CHECK IF ERROR
@@ -27,8 +33,14 @@ func GetUser(c *gin.Context) {
 		c.JSON(getErr.Status, getErr)
 		return
 	}
+
+	if oauth.GetCallerId(c.Request) == user.ID {
+		c.JSON(http.StatusOK, user.Marshall(false))
+		return
+	}
+	
 	// SEND RESPONSE
-	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public")=="true"))
+	c.JSON(http.StatusOK, user.Marshall(oauth.IsPublic(c.Request)))
 
 }
 
@@ -121,5 +133,5 @@ func Login(c *gin.Context) {
 		c.JSON(err.Status, err)
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public")=="true"))
 }

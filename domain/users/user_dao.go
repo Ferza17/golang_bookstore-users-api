@@ -7,16 +7,18 @@ import (
 	"github.com/ferza17/golang_bookstore-users-api/utils/crypt"
 	"github.com/ferza17/golang_bookstore-users-api/utils/date"
 	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
+	mysql_utils "github.com/ferza17/golang_bookstore-users-api/utils/mysql"
+	"strings"
 )
 
 const (
-	queryInsertUser       		= "INSERT INTO users(Firstname, Lastname,Email,DateCreated, Status, Password) VALUES (?,?,?,?,?,?);"
-	queryGetUser          		= "SELECT * FROM users WHERE ID=?"
-	queryUpdateUser       		= "UPDATE users SET Firstname=?, Lastname=?, Email=? , Status =?, Password=? WHERE ID=?"
-	queryDeleteUser       		= "DELETE FROM users WHERE ID=?"
-	queryFindUserByStatus 		= "SELECT ID,Firstname, Lastname,Email,DateCreated, Status FROM users WHERE Status =?"
-	queryFindByEmailAndPassword = "SELECT ID, Firstname, Lastname, Email, DateCreated, Status FROM users WHERE Email=? AND Password=?"
-	)
+	queryInsertUser             = "INSERT INTO users(Firstname, Lastname,Email,DateCreated, Status, Password) VALUES (?,?,?,?,?,?);"
+	queryGetUser                = "SELECT * FROM users WHERE ID=?"
+	queryUpdateUser             = "UPDATE users SET Firstname=?, Lastname=?, Email=? , Status =?, Password=? WHERE ID=?"
+	queryDeleteUser             = "DELETE FROM users WHERE ID=?"
+	queryFindUserByStatus       = "SELECT ID,Firstname, Lastname,Email,DateCreated, Status FROM users WHERE Status =?"
+	queryFindByEmailAndPassword = "SELECT ID, Firstname, Lastname, Email, DateCreated, Status FROM users WHERE Email=? AND Password=? AND Status =?"
+)
 
 // Communicate with database to GET DATA
 func (user *User) Get() *errors.RestError {
@@ -142,8 +144,11 @@ func (user *User) FindByEmailAndPassword() *errors.RestError {
 	defer stmt.Close()
 
 	// executing query with email and password that declare in constant and save result to result variable
-	result := stmt.QueryRow(user.Email, user.Password)
-	if getErr := result.Scan(&user.ID, &user.Firstname, &user.Lastname, &user. Email, &user.DateCreated, &user.Status); getErr != nil {
+	result := stmt.QueryRow(user.Email, user.Password, StatusActive)
+	if getErr := result.Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.DateCreated, &user.Status); getErr != nil {
+		if strings.Contains(getErr.Error(), mysql_utils.ErrorNoRows) {
+			return errors.NewNotFoundError("Invalid user credentials")
+		}
 		logger.Error("error when trying to get user by email and password", err)
 		return errors.NewInternalServerError("Database Error")
 	}

@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/ferza17/golang_bookstore-users-api/domain/users"
+	"github.com/ferza17/golang_bookstore-users-api/utils/crypt"
 	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
 )
 
@@ -103,7 +104,7 @@ func (s *userServiceStruct) Search(status string) (users.Users, *errors.RestErro
 func (s *userServiceStruct) LoginUser(request users.LoginRequest) (*users.User, *errors.RestError) {
 	dao := &users.User{
 		Email:    request.Email,
-		Password: request.Password,
+		Password: crypt.GetMd5(request.Password),
 	}
 	if err := dao.FindByEmailAndPassword(); err != nil {
 		return nil, err

@@ -1,6 +1,9 @@
 package users
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/ferza17/golang_bookstore-users-api/utils/errors"
+)
 
 type PublicUser struct {
 	ID          int64  `json:"user_id"`
@@ -26,7 +29,7 @@ func (users Users) Marshall (isPublic bool) []interface{} {
 
 func (user *User) Marshall (isPublic bool) interface{}{
 	// Approach 1
-	if isPublic {
+	if isPublic{
 		return PublicUser{
 			ID: user.ID,
 			DateCreated: user.DateCreated,
@@ -36,7 +39,9 @@ func (user *User) Marshall (isPublic bool) interface{}{
 	// Approach 2
 	userJson, _ := json.Marshal(user)
 	var privateUser PrivateUser
-	_ = json.Unmarshal(userJson, &privateUser)
+	if err := json.Unmarshal(userJson, &privateUser); err != nil {
+	 	return errors.NewInternalServerError("error when unmarshalling private user")
+	}
 	return privateUser
 
 }
